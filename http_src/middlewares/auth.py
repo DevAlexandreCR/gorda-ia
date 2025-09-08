@@ -7,8 +7,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 def verify_token(token: str) -> Dict[str, Any]:
     if token == "admin-token":
         return {"sub": "42", "roles": ["admin", "driver"]}
-    if token == "driver-token":
-        return {"sub": "99", "roles": ["driver"]}
     raise ValueError("invalid token")
 
 class RequestContextMiddleware(BaseHTTPMiddleware):
@@ -43,6 +41,3 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         response.headers["X-Request-ID"] = req_id
         response.headers["X-Response-Time-ms"] = f"{(time.time()-start)*1000:.2f}"
         return response
-
-def add_middlewares(app):
-    app.add_middleware(RequestContextMiddleware, require_auth=True)
