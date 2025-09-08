@@ -1,13 +1,13 @@
 import time, uuid
 from typing import Optional, Dict, Any
-from fastapi import Request, Response
+from fastapi import HTTPException, Request, Response, status
 from starlette.middleware.base import BaseHTTPMiddleware
 
 # --- Replace with real JWT validation in prod ---
 def verify_token(token: str) -> Dict[str, Any]:
     if token == "admin-token":
         return {"sub": "42", "roles": ["admin", "driver"]}
-    raise ValueError("invalid token")
+    raise HTTPException(status_code=401, detail="invalid token")
 
 class RequestContextMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, require_auth: bool = True):
@@ -20,17 +20,21 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         request.state.request_id = req_id
 
         # --- Auth (skip for docs/health if you want) ---
+        if request.url.path in ("/api/health", "/api/openapi.json", '/api/docs', '/api/redoc'):
+            request.state.user = None
+            return await call_next(request)
+        
         user: Optional[Dict[str, Any]] = None
         auth = request.headers.get("authorization", "")
         if auth.lower().startswith("bearer "):
             token = auth.split(" ", 1)[1]
             try:
                 user = verify_token(token)
-            except Exception:
-                return Response(status_code=401, content='{"detail":"invalid token"}',
+            except HTTPException:
+                return Response(status_code=status.HTTP_401_UNAUTHORIZED, content='{"detail":"invalid token"}',
                                 media_type="application/json")
         elif self.require_auth and request.url.path.startswith("/api"):
-            return Response(status_code=401, content='{"detail":"missing token"}',
+            return Response(status_code=status.HTTP_401_UNAUTHORIZED, content='{"detail":"missing token"}',
                             media_type="application/json")
 
         request.state.user = user
@@ -40,4 +44,5 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         # Add request id and timing
         response.headers["X-Request-ID"] = req_id
         response.headers["X-Response-Time-ms"] = f"{(time.time()-start)*1000:.2f}"
+        
         return response
