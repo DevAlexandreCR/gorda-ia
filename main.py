@@ -8,7 +8,7 @@ def create_app() -> FastAPI:
         version="1.0",
         prefix="/api"
     )
-    # app.add_middleware(RequestContextMiddleware, require_auth=True)
+    app.add_middleware(RequestContextMiddleware, require_auth=True)
     app.include_router(chat_router)
     return app
 
