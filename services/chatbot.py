@@ -1,5 +1,5 @@
 import os
-from openai import OpenAI, RateLimitError, APITimeoutError, APIConnectionError, AuthenticationError, InternalServerError
+from openai import OpenAI, RateLimitError, APIConnectionError, AuthenticationError, InternalServerError
 import logging
 
 # Set up logging
@@ -49,9 +49,6 @@ class ChatBot:
         except RateLimitError as e:
             logger.error("Rate limit exceeded: %s", e.message)
             return "Sorry, the service is currently busy. Please try again later."
-        except APITimeoutError as e:
-            logger.error(f"Request timed out: %s", e.message)
-            return "Sorry, the request timed out. Please try again."
         except AuthenticationError as e:
             logger.error("Authentication error: %s", e.message)
             return "Sorry, there's an authentication issue. Please check the API key."
@@ -59,5 +56,5 @@ class ChatBot:
             logger.error("API error: %s", e.message)
             return "Sorry, there was an issue with the API. Please try again later."
         except Exception as e:
-            logger.error("Unexpected error: %s", e.message)
-            return "Sorry, an unexpected error occurred. Please try again later."
+            logger.exception("Unexpected error occurred")
+            raise
