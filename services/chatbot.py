@@ -15,11 +15,12 @@ class ChatBot:
             logger.info(f"Processing message request: {message[:10]}...")
             
             response = self.client.responses.create(
-                model="gpt-5-mini",
+                model="gpt-3.5-turbo",
                 input=message,
-                max_output_tokens=50,
-                timeout=30,
-                instructions="You are a assistant and the service we provided is like uber. we need to get the place name where user wants to be picked up."
+                prompt={
+                    "id": "pmpt_68bf9e8505388194b3ed8f3b76d5699d0b4eba68f39ab425",
+                    "version": "2"
+                }
             )
             
             response_content = response.output_text
