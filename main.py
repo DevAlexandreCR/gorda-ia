@@ -21,6 +21,6 @@ def create_app() -> FastAPI:
 app = create_app()
 
 @app.get("/health", status_code=status.HTTP_200_OK)
-async def health_check():
+async def health_check():    
     return {"status": "ok"}
 
