@@ -1,27 +1,29 @@
 import os
 from openai import OpenAI, RateLimitError, APIConnectionError, AuthenticationError, InternalServerError
-import logging
+from utils.logger import get_logger
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Get logger instance
+logger = get_logger()
 
 class ChatBot:
     def __init__(self):
         self.api_key = os.environ.get("OPENAI_KEY", "default-api-key")
         self.client = OpenAI(api_key=self.api_key)
 
-        print(f"ChatBot initialized with API Key: {self.api_key}")
+        logger.info(f"ChatBot initialized with API Key: {self.api_key}")
         # Initialize other necessary attributes
 
     def get_response(self, message: str) -> str:
         try:
+            logger.info(f"Processing message request: {message[:50]}...")
+            
             # Validate input
             if not message or message.strip() == "":
+                logger.warning("Empty message received")
                 return "Please provide a valid message."
             
             response = self.client.responses.create(
-                model="gpt-5-nano",
+                model="gpt-5-mini",
                 input=message,
                 max_output_tokens=50,
                 timeout=30,
@@ -31,20 +33,21 @@ class ChatBot:
             # Get the response content
             response_content = response.output_text
             
+            logger.info("Successfully generated response")
             return response_content.strip()
             
         except APIConnectionError as e:
-            logger.error("API connection error: %s", e.message)
+            logger.error(f"API connection error: {e}")
             return "Sorry, there's a connection issue. Please check your internet and try again."
         except RateLimitError as e:
-            logger.error("Rate limit exceeded: %s", e.message)
+            logger.error(f"Rate limit exceeded: {e}")
             return "Sorry, the service is currently busy. Please try again later."
         except AuthenticationError as e:
-            logger.error("Authentication error: %s", e.message)
+            logger.error(f"Authentication error: {e}")
             return "Sorry, there's an authentication issue. Please check the API key."
         except InternalServerError as e:
-            logger.error("API error: %s", e.message)
+            logger.error(f"API error: {e}")
             return "Sorry, there was an issue with the API. Please try again later."
         except Exception as e:
-            logger.exception("Unexpected error occurred")
-            raise
+            logger.error(f"Unexpected error occurred: {e}")
+            return "Sorry, an unexpected error occurred. Please try again later."
