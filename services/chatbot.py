@@ -20,26 +20,16 @@ class ChatBot:
             if not message or message.strip() == "":
                 return "Please provide a valid message."
             
-            response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": message
-                    }
-                ],
-                max_tokens=150,
-                temperature=0.7,
-                timeout=30
+            response = self.client.responses.create(
+                model="gpt-5-nano",
+                input=message,
+                max_output_tokens=50,
+                timeout=30,
+                instructions="You are a assistant and the service we provided is like uber. we need to get the place name where user wants to be picked up."
             )
             
-            # Check if response has choices
-            if not response.choices or len(response.choices) == 0:
-                logger.error("No choices returned from OpenAI API")
-                return "Sorry, I couldn't generate a response at the moment."
-            
             # Get the response content
-            response_content = response.choices[0].message.content
+            response_content = response.output_text
             
             return response_content.strip()
             
