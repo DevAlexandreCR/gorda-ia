@@ -14,8 +14,9 @@ def create_app() -> FastAPI:
     )
     
     # Add middleware and protected routes
-    api.add_middleware(RequestContextMiddleware, require_auth=True)
-    api.include_router(chat_router, dependencies=[Depends(security)])
+    # api.add_middleware(RequestContextMiddleware, require_auth=True)
+    # api.include_router(chat_router, dependencies=[Depends(security)])
+    api.include_router(chat_router)
     return api
 
 app = create_app()
