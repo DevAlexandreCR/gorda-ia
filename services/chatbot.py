@@ -10,17 +10,9 @@ class ChatBot:
         self.api_key = os.environ.get("OPENAI_KEY", "default-api-key")
         self.client = OpenAI(api_key=self.api_key)
 
-        logger.info(f"ChatBot initialized with API Key: {self.api_key}")
-        # Initialize other necessary attributes
-
     def get_response(self, message: str) -> str:
         try:
-            logger.info(f"Processing message request: {message[:50]}...")
-            
-            # Validate input
-            if not message or message.strip() == "":
-                logger.warning("Empty message received")
-                return "Please provide a valid message."
+            logger.info(f"Processing message request: {message[:10]}...")
             
             response = self.client.responses.create(
                 model="gpt-5-mini",
@@ -30,7 +22,6 @@ class ChatBot:
                 instructions="You are a assistant and the service we provided is like uber. we need to get the place name where user wants to be picked up."
             )
             
-            # Get the response content
             response_content = response.output_text
             
             logger.info("Successfully generated response")
