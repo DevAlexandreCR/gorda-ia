@@ -3,7 +3,6 @@ from fastapi.security import HTTPBearer
 from http_src.controllers.chat_controller import router as chat_router
 from http_src.middlewares.auth import RequestContextMiddleware
 
-# Global security scheme
 security = HTTPBearer()
 
 def create_app() -> FastAPI:
@@ -13,9 +12,8 @@ def create_app() -> FastAPI:
         root_path="/api"
     )
     
-    # Add middleware and protected routes
-    # api.add_middleware(RequestContextMiddleware, require_auth=True)
-    # api.include_router(chat_router, dependencies=[Depends(security)])
+    api.add_middleware(RequestContextMiddleware, require_auth=True)
+    api.include_router(chat_router, dependencies=[Depends(security)])
     api.include_router(chat_router)
     return api
 
