@@ -19,7 +19,6 @@ class ChatBot:
                 input=message,
                 prompt={
                     "id": "pmpt_68bf9e8505388194b3ed8f3b76d5699d0b4eba68f39ab425",
-                    "version": "2"
                 }
             )
             
