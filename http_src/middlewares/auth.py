@@ -2,10 +2,11 @@ import time, uuid
 from typing import Optional, Dict, Any
 from fastapi import HTTPException, Request, Response, status
 from starlette.middleware.base import BaseHTTPMiddleware
+import os
 
 # --- Replace with real JWT validation in prod ---
 def verify_token(token: str) -> Dict[str, Any]:
-    if token == "admin-token":
+    if token == os.environ.get("ADMIN_KEY"):
         return {"sub": "42", "roles": ["admin", "driver"]}
     raise HTTPException(status_code=401, detail="invalid token")
 
